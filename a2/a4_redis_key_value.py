@@ -1,19 +1,19 @@
 import redis
 
-r_server = redis.Redis('localhost') #this line creates a new Redis object and
-                                    #connects to our redis server
-r_server.set('test_key', 'test_value') #with the created redis object we can
-                                        #submits redis commands as its methods
-                                        
-print 'previous set key ' + r_server.get('test_key') # the previous set key is fetched
 
-'''In the previous example you saw that we introduced a redis
-data type: the string, now we will set an integer and try to
-increase its value using redis object built-in methods'''
+def create_redis(host="localhost", kvs=("1337", 1337)):
+  r_server = redis.Redis('localhost')
+  r_server.set(kvs[0], kvs[1])                                  
+  return r_server
 
-r_server.set('counter', 1) #set an integer to a key
-r_server.incr('counter') #we increase the key value by 1, has to be int
-print 'the counter was increased! '+ r_server.get('counter') #notice that the key is increased now
+def load_file():
+
+
+def fill_redis_with_file_content():
+
+
+r_server.set('counter', 1)
+r_server.incr('counter')
 
 r_server.decr('counter') #we decrease the key value by 1, has to be int
 print 'the counter was decreased! '+ r_server.get('counter') #the key is back to normal
