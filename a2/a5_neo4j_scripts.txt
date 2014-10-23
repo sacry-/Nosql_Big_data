@@ -1,0 +1,52 @@
+#Aufgabe 5, Prakikum 2
+#Teil a)
+//Insert HAW Module
+CREATE (MG:Modul {name:"Mathematische Grundlagen", kurz:"MG", semester:1}),
+(GI:Modul {name:"Grundlagen Informatik", kurz:"GI", semester:1}),
+(PR:Modul {name:"Programmiertechnik/-methodik", kurz:"PR", semester:1}),
+(BW:Modul {name:"Betriebswirtschaft", kurz:"BW", semester:1}),
+(LB:Modul {name:"Logik und Berechenbarkeit", kurz:"LB", semester:2}),
+(AF:Modul {name:"Automaten und Formale Sprachen", kurz:"AF", semester:2}),
+(DB:Modul {name:"Datenbanken", kurz:"DB", semester:2}),
+(PR2:Modul {name:"Programmieren", kurz:"PR2", semester:2}),
+(GKA:Modul {name:"Graphentheoretische Konzepte und Algorithmen", kurz:"GKA", semester:3}),
+(AD:Modul {name:"Algorithmen und Datenstrukturen", kurz:"AD", semester:3}),
+(SE1:Modul {name:"Software Engineering I", kurz:"SE1", semester:3}),
+(BS:Modul {name:"Betriebssysteme", kurz:"BS", semester:3}),
+(BW2:Modul {name:"Betriebswirtschaft 2", kurz:"BW2", semester:3}),
+(IS:Modul {name:"Intelligente Systeme", kurz:"IS", semester:4}),
+(SE2:Modul {name:"Software Engenieering 2", kurz:"SE2", semester:4}),
+(RN:Modul {name:"Rechnernetze", kurz:"RN", semester:4}),
+(ITS:Modul {name:"IT Sicherheit", kurz:"ITS", semester:4}),
+(NOSQL:Modul {name:"NoSQL und BigData", kurz:"NOSQL", semester:5}),
+(VS:Modul {name:"Verteilte Systeme", kurz:"VS", semester:5}),
+(AI:Modul {name:"Architektur von Informationsystemen", kurz:"AI", semester:5});
+
+//Insert Modul Condition Edges
+MATCH (mg:Modul {kurz:"MG"}), (pr:Modul {kurz:"PR"}), (bw:Modul {kurz:"BW"}), (lb:Modul {kurz:"LB"}),
+(af:Modul {kurz:"AF"}), (db:Modul {kurz:"DB"}), (pr2:Modul {kurz:"PR2"}), (gka:Modul {kurz:"GKA"}), 
+(ad:Modul {kurz:"AD"}), (se1:Modul {kurz:"SE1"}), (bs:Modul {kurz:"BS"}), (bw2:Modul {kurz:"BW2"}),
+(is:Modul {kurz:"IS"}),(se2:Modul {kurz:"SE2"}), (rn:Modul {kurz:"RN"}), (its:Modul {kurz:"ITS"}),
+(vs:Modul {kurz:"VS"}), (ai:Modul {kurz:"AI"}), (nosql:Modul {kurz:"NOSQL"})      
+CREATE (mg)-[rel1:Condition]->(lb),
+(bw)-[rel2:Condition]->(bw2),
+(lb)-[rel3:Condition]->(ad),
+(pr)-[rel4:Condition]->(pr2),
+(lb)-[rel5:Condition]->(gka),
+(se1)-[rel6:Condition]->(se2),
+(pr2)-[rel7:Condition]->(se1),
+(af)-[rel8:Condition]->(gka),
+(rn)-[rel9:Condition]->(vs),
+(rn)-[rel10:Condition]->(its),
+(vs)-[rel11:Condition]->(nosql),
+(db)-[rel12:Condition]->(nosql),
+(gka)-[rel13:Condition]->(nosql);
+
+###Teil b)
+//Get Conditions for Module NoSQL
+MATCH (modul)-[:Condition]->(nosql:Modul {kurz:"NOSQL"})
+RETURN modul.kurz
+
+//Get unused Modules
+MATCH modul WHERE NOT (modul:Modul)-[:Condition]->()
+RETURN modul.kurz
