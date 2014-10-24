@@ -17,11 +17,10 @@ def load_file(apath):
 
 #add Hash h to Redis
 def populate_redis_with_hash(r_server, h):
-	result = []
-	for elem in h:
-		r_server.set(elem["_id"], elem)
-		r_server.rpush(elem["city"], elem["_id"])
-	print "Populated!"
+  for elem in h:
+    r_server.set(elem["_id"], elem)
+    r_server.rpush(elem["city"], elem["_id"])
+  print "Populated!"
 
 #connect to redis and load data if not in db
 def create_redis():
@@ -32,15 +31,31 @@ def create_redis():
 		populate_redis_with_hash(r_server, h)
 	return r_server
 
+def get_key(r_server, plz):
+  return string_to_hash(r_server.get(plz))
 
 # aufgabe 4b
 def get_city_and_state(r_server, plz=""):
-	if(plz == ""):
+	if not plz:
 		plz = raw_input("Bitte eine PLZ angeben: ")
+  res = get_key(r_server, plz)
+  return (res["city"], res["state"])
 
-	res = []
-	res = string_to_hash(r_server.get(plz))
-  	return (res["city"], res["state"])
+# aufgabe 4c
+def plz_for_town(r_server, town):
+  return r_server.lrange(town, 0, r_server.llen(town))
+
+# aufgabe 4c
+def plz_for_town_slow(r_server, town):
+  for key in r_server.keys("[0-9][0-9]*"):
+    if get_key(r_server, key)["city"] == town:
+      yield key
+
+r_server = create_redis()
+print get_city_and_state(r_server, "13063")
+
+print plz_for_town(r_server, "HAMBURG")
+print plz_for_town(r_server, "TUMTUM")
 
 # aufgabe 4c
 def plz_for_town(r_server, town=""):
