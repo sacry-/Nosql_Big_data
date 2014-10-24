@@ -1,5 +1,6 @@
 import redis
 import ast
+import readline
 
 
 #decode JSON
@@ -57,6 +58,7 @@ def plz_for_town(r_server, town):
 
 #gui
 def terminal():
+  readline.parse_and_bind("tab: complete")
   r_server = create_redis()
   command = ""
   while command != "exit":
@@ -76,6 +78,7 @@ def terminal():
     else:
       print "commands: GETZIP, GETTOWN, exit"
     command = raw_input()
+
 
 try:
   terminal() 
