@@ -60,25 +60,28 @@ def terminal():
   r_server = create_redis()
   command = ""
   while command != "exit":
-    if command == "GETPLZ":
+    if command.startswith("GETTOWN"):
       try:
-        town = raw_input("provide a town: ")
-        print "zip-code(s): %s" % plz_for_town(r_server, town)
+        command = command.split(" ")
+        print "zip-code(s): %s" % plz_for_town(r_server, command[1])
       except:
         print "Value not found!"
-    elif command == "GETTOWN":
+    elif command.startswith("GETZIP"):
       try:
-        plz = raw_input("provide a zip-code: ")
-        res = get_city_and_state(r_server, plz)
+        command = command.split(" ")
+        res = get_city_and_state(r_server, command[1])
         print "(%s, %s)" % res
       except:
         print "Value not found!"
     else:
-      print "commands: GETPLZ, GETTOWN, exit"
+      print "commands: GETZIP, GETTOWN, exit"
     command = raw_input()
-  print "bye bye."
 
-terminal() 
+try:
+  terminal() 
+except:
+  pass
+print "bye bye"
   
 # r_server = create_redis()
 # print get_city_and_state(r_server, "13063")
