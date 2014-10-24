@@ -16,7 +16,7 @@ key: id -> value: json {}
 key: town -> value: List[id]
 
 example: 
-  id: 01001 -> {"_id" : "62045", 
+  id: 62045 -> {"_id" : "62045", 
                 "city" : "HAMBURG", 
                 "loc" : [ -72.622739, 42.070206 ], 
                 "pop" : 15338, 
