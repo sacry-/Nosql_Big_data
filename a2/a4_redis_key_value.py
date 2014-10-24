@@ -2,32 +2,6 @@ import redis
 import ast
 
 
-'''
-
-Das vorliegende File hat typische Python hash syntax die an json angelehnt ist.
-Wir laden die File rein, rufen python interne konvertierung von string zu einem hash auf
-und befüllen über redis-py die ID als key and den restlichen hash als value (string). 
-Zusaetzlich speichern wir die Stadt jedes hashes auf eine Liste von IDs, sodass ein lookup von 
-Stadt zu ID O(1) kostet. 
-Alternativ muesste man sonst einfach über alle keys iterieren "suchen". Dies ist notwendig
-da es mehrere gleiche Stadtnamen mit unterschiedlichen IDs gibt.
-
-key: id -> value: json {}
-key: town -> value: List[id]
-
-example: 
-  id: 62045 -> {"_id" : "62045", 
-                "city" : "HAMBURG", 
-                "loc" : [ -72.622739, 42.070206 ], 
-                "pop" : 15338, 
-                "state" : "MA" }
-  ..
-
-  id: HAMBURG -> ['62045', '71646', '54411', '07419', '71339', '55339', '14075', '51640', '19526']
-  ..
-
-'''
-
 #decode JSON
 def string_to_hash(json_string):
   return ast.literal_eval(json_string)
@@ -87,12 +61,18 @@ def terminal():
   command = ""
   while command != "exit":
     if command == "GETPLZ":
-      town = raw_input("provide a town: ")
-      print "zip-code(s): %s" % plz_for_town(r_server, town)
+      try:
+        town = raw_input("provide a town: ")
+        print "zip-code(s): %s" % plz_for_town(r_server, town)
+      except:
+        print "Value not found!"
     elif command == "GETTOWN":
-      plz = raw_input("provide a zip-code: ")
-      res = get_city_and_state(r_server, plz)
-      print "(%s, %s)" % res
+      try:
+        plz = raw_input("provide a zip-code: ")
+        res = get_city_and_state(r_server, plz)
+        print "(%s, %s)" % res
+      except:
+        print "Value not found!"
     else:
       print "commands: GETPLZ, GETTOWN, exit"
     command = raw_input()
