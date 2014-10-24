@@ -1,6 +1,33 @@
 import redis
 import ast
 
+
+'''
+
+Das vorliegende File hat typische Python hash syntax die an json angelehnt ist.
+Wir laden die File rein, rufen python interne konvertierung von string zu einem hash auf
+und befüllen über redis-py die ID als key and den restlichen hash als value (string). 
+Zusätzlich speichern wir die Stadt jedes hashes auf eine Liste von IDs, sodass ein lookup von 
+Stadt zu ID O(2) kostet. 
+Alternativ müsste man sonst einfach über alle keys iterieren "suchen". Dies ist notwendig
+da es mehrere gleiche Stadtnamen mit unterschiedlichen IDs gibt.
+
+key: id -> value: json {}
+key: town -> value: List[id]
+
+example: 
+  id: 01001 -> {"_id" : "62045", 
+                "city" : "HAMBURG", 
+                "loc" : [ -72.622739, 42.070206 ], 
+                "pop" : 15338, 
+                "state" : "MA" }
+  ..
+
+  id: HAMBURG -> ['62045', '71646', '54411', '07419', '71339', '55339', '14075', '51640', '19526']
+  ..
+
+'''
+
 #decode JSON
 def string_to_hash(json_string):
   return ast.literal_eval(json_string)
