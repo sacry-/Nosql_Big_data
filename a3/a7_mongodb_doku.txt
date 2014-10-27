@@ -1,0 +1,6 @@
+#Dokumentation WP NoSQL und BigData Praktikum 3
+
+Aufgabe 7
+a) Zum Importierten der plz.data muss man einfach 
+mongoimport plz.data
+eingeben (im Verzeichnis wo die Daten liegen). Das Format plz.data entspricht schon dem gewünschten Format für MongoDB.
