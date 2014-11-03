@@ -1,6 +1,12 @@
 #Dokumentation WP NoSQL und BigData Praktikum 3
 
 Aufgabe 7
-a) Zum Importierten der plz.data muss man einfach 
-mongoimport plz.data
+a)
+Zuerst muss man mongodb starten, dies geht über den Befehl mongod
+MongoDB braucht den Ordner /data/db/, dieser muss vorher erstellt werden.
+Zum Importierten der plz.data muss man einfach 
+mongoimport plz.data -d plz -c plz --file plz.json
+(-d gibt dabei die Datenbank an und -c die Collection)
 eingeben (im Verzeichnis wo die Daten liegen). Das Format plz.data entspricht schon dem gewünschten Format für MongoDB.
+
+
