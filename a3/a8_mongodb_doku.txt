@@ -43,7 +43,7 @@ d) Nachdem wir
 
 db.fussball.update({name: 'Augsburg'}, {Tabellenplatz: 1})
 
-ausführen, verschwindet Augsburg aus der Suche. Ein Überprühfung
+ausführen, verschwindet Augsburg aus der Suche. Eine Überprühfung
 
 db.fussball.find({name:"Augsburg"})
 
@@ -53,12 +53,11 @@ bringt keinerlei Resultate. Augsburg wurde überschrieben ausschließlich mit de
 ->
 { "_id" : ObjectId("545c96e0b19a776dabae6c94"), "Tabellenplatz" : 1 }
 
-Damit ein Dokument ein update bekommt (mit einem gegebenen Attribut) muss z.B. ein Index auf dem Namen liegen oder alle Felder müssen explizit angegeben werden.
+Damit ein Dokument ein update bekommt (mit einem gegebenen Attribut) muss z.B. ein Index auf dem Namen liegen, alle felder müssen dupliziert werden (document replacement) oder man benutzt modifier wie $set oder $inc.
 
 e)
-
 1. db.fussball.update({"name" : "Leverkusen"}, {"$set" : {"Tabellenplatz" : 2}})
 2. db.fussball.update({"name" : "Werder"}, {"$inc" : {"Tabellenplatz" : -1}})
 3. db.fussball.update({"_id" : ObjectId("545c96e0b19a776dabae6c8f")}, {"$set" : {"abgestiegen" : true}})
-4. ??
+4. db.fussball.update({farben: { $eq: 'weiss'}}, {"$set" : {"„Waschtemperatur“" : 90}}, { multi: true })
 
