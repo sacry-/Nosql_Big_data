@@ -1,5 +1,13 @@
 #Dokumentation WP NoSQL und BigData Praktikum 3
 
+# Installation on mac
+brew install mongodb
+# start
+mkdir /data/
+mkdir /data/db/
+chmod 700 /data/db/
+sudo mongod
+
 Aufgabe 7
 a)
 Zuerst muss man mongodb starten, dies geht über den Befehl mongod

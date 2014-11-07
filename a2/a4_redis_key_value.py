@@ -1,5 +1,6 @@
 import redis
 import ast
+import os
 import readline
 
 
@@ -25,11 +26,11 @@ def populate_redis_with_hash(r_server, h):
   print "Populated!"
 
 #connect to redis and load data if not in db
-def create_redis():
-  r_server = redis.Redis('localhost')
+def create_redis(_host='localhost', _port=6379):
+  r_server = redis.Redis(host=_host, port=_port)
   if not r_server.exists("13063"):
     print "No data exists, importing plz.data..."
-    h = load_file("./plz.data")
+    h = load_file("%s/plz.data" % os.path.dirname(os.path.realpath(__file__)))
     populate_redis_with_hash(r_server, h)
   return r_server
 
@@ -37,12 +38,12 @@ def get_key(r_server, plz):
   return string_to_hash(r_server.get(plz))
 
 # aufgabe 4b
-def get_city_and_state(r_server, plz):
+def get_city_and_state_r(r_server, plz):
   res = get_key(r_server, plz)
   return (res["city"], res["state"])
 
 # aufgabe 4c
-def plz_for_town(r_server, town):
+def plz_for_town_r(r_server, town):
   return r_server.lrange(town, 0, r_server.llen(town))
 
 # aufgabe 4c slow
@@ -65,13 +66,13 @@ def terminal():
     if command.startswith("GETTOWN"):
       try:
         command = command.split(" ")
-        print "zip-code(s): %s" % plz_for_town(r_server, command[1])
+        print "zip-code(s): %s" % plz_for_town_r(r_server, command[1])
       except:
         print "Value not found!"
     elif command.startswith("GETZIP"):
       try:
         command = command.split(" ")
-        res = get_city_and_state(r_server, command[1])
+        res = get_city_and_state_r(r_server, command[1])
         print "(%s, %s)" % res
       except:
         print "Value not found!"
@@ -80,11 +81,12 @@ def terminal():
     command = raw_input()
 
 
-try:
-  terminal() 
-except:
-  pass
-print "bye bye"
+def try_terminal():
+  try:
+    terminal() 
+  except:
+    pass
+  print "bye bye"
   
 # r_server = create_redis()
 # print get_city_and_state(r_server, "13063")
