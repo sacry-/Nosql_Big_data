@@ -1,0 +1,40 @@
+Aufgabe 8
+a) 
+MongoDB Shell starten:
+sudo /usr/bin/./mongo
+
+Nun wählt man eine Datenbank aus:
+use fussball
+(Die Datenbank wird "erstellt", falls diese nicht existiert)
+
+Mit dem Befehl db wird die derzeitig ausgewählt Datenbank angezeigt
+
+Dann die Befehle aus der sinndeslebens.txt kopieren und in die Konsole einfügen.
+
+Überprüfen ob die Datensätze eingefügt wurden:
+db.fussball.find({name:"Werder"})
+
+b) Lassen Sie sich nun die Vereine mit den jeweils folgenden Eigenschaften anzeigen:
+	1. mit Namen ‚Augsburg‘
+	db.fussball.find({name:"Augsburg"})
+
+	2. alle Nike-Vereine, welche schwarz als mindestens eine Vereinsfarbe haben 
+	db.fussball.find({farben:'schwarz',nike:'j'})
+
+	3. alle Nike-Vereine, welche weiss und grün als Vereinsfarbe haben
+	db.fussball.find({farben:'weiss',farben:'gruen',nike:'j'})
+
+	4. alle Nike-Vereine, welche weiss oder grün als Vereinsfarbe haben
+	db.fussball.find({ $or: [{farben:'weiss'},{farben:'gruen'}],nike:'j'})
+
+	5. den Verein mit dem höchsten Tabellenplatz
+	-Zuerst einen Index über die Tabellenplätze erstellen (vielleicht nicht notwendig):
+		db.records.ensureIndex({Tabellenplatz:1}) 
+	-Verein mit dem höchsten Tabellenplatz:
+		db.fussball.find().sort({Tabellenplatz : 1}).limit(1)
+
+	6. alle Vereine, die nicht auf einem Abstiegsplatz stehen
+	db.fussball.find({Tabellenplatz:{$lt:16}}).sort({Tabellenplatz:1})
+
+c) Erstellen Sie eine beliebige andere sinnvolle Abfrage und unterdrücken Sie dabei die Ausgabe des _id Feldes
+	db.fussball.find({"nike":"n"},{_id:0})
