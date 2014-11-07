@@ -58,6 +58,6 @@ Damit ein Dokument ein update bekommt (mit einem gegebenen Attribut) muss z.B. e
 e)
 1. db.fussball.update({"name" : "Leverkusen"}, {"$set" : {"Tabellenplatz" : 2}})
 2. db.fussball.update({"name" : "Werder"}, {"$inc" : {"Tabellenplatz" : -1}})
-3. db.fussball.update({"_id" : ObjectId("545c96e0b19a776dabae6c8f")}, {"$set" : {"abgestiegen" : true}})
+3. db.fussball.update({name: { $eq : "HSV" }}, {"$set" : {"abgestiegen" : true}})
 4. db.fussball.update({farben: { $eq: 'weiss'}}, {"$set" : {"„Waschtemperatur“" : 90}}, { multi: true })
 
