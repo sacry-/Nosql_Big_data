@@ -76,14 +76,16 @@ def execute(copy_from_local, map_reduce, copy_to_local):
 # uses defaults: python map_reduce_job.py
 # uses provided paths: python map_reduce_job.py -hadoop_home=abc/de -stream_jar=abc/de
 def run_job():
-  print "configuring..."
   nosql_dir, hadoop_home, stream_jar = parse_args()
   config = Config(nosql_dir, hadoop_home, stream_jar)
   print config
 
-  print "executing map/reduce job.."
   copy_from_local, map_reduce, copy_to_local = create_job(config.to_hash())
-  execute(copy_from_local, map_reduce, copy_to_local)
+  try:
+    execute(copy_from_local, map_reduce, copy_to_local)
+    print "excution success!"
+  except:
+    print "execution failed!"
 
 
 run_job()
