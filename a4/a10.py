@@ -5,6 +5,25 @@ sys.path.insert(0, "%s/../a2" % abs_file_path)
 # /usr/local/Cellar/hbase/0.98.6.1/
 # sudo hbase master start
 # sudo hbase thrift start -threadpool
+# _____________
+# Unter dem hduser
+# Hdoop starten:
+# cd /usr/local/hadoop
+# sbin/start-all.sh
+#
+# map_reduce starten:
+# cd /home/hduser/Nosql_Big_data/a4/
+# bash ./map_reduce.sh
+# _______________________________
+# Hbase: 
+# ssh nosql@localhost
+# cd /home/nosql/Downloads/hbase-0.98.7-hadoop2/
+# ./bin/start-hbase.sh (Hbase Start)
+#
+# Thrift:
+# ./bin/hbase thrift start
+#
+
 
 import happybase
 from a4_redis_key_value import load_file
