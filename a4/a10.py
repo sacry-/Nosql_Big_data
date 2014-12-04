@@ -2,6 +2,9 @@ import os, sys
 abs_file_path = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, "%s/../a2" % abs_file_path)
 
+# /usr/local/Cellar/hbase/0.98.6.1/
+# sudo hbase master start
+# sudo hbase thrift start -threadpool
 
 import happybase
 from a4_redis_key_value import load_file
@@ -10,6 +13,7 @@ def data_exists(table):
   return len([key for key, data in table.rows(['01001', '47270', '99950'])]) == 3
 
 def populate_hbase(table):
+  print "setting up table"
   list_of_hashes = load_file("%s/plz.data" % abs_file_path)
   for h in list_of_hashes:
     zip_code = h["_id"]
@@ -20,14 +24,18 @@ def populate_hbase(table):
     table.put(zip_code, result)
 
 def setup_and_table():
-  connection = happybase.Connection('localhost')
+  connection = happybase.Connection(host='localhost', port=9090)
+  print "opening connection"
   connection.open()
+  print "connection opened"
 
+  print connection.tables()
   db_name = "zip2"
   try:
     connection.create_table(db_name, {'family': dict(), "Fussball" : dict()})
+    print "successfully created table!"
   except:
-    print "already exists"
+    print "table already exists"
 
   table = connection.table(db_name)
   print "tables: %s" % connection.tables()
@@ -38,6 +46,8 @@ table = setup_and_table()
 
 if not data_exists(table):
   populate_hbase(table)
+else:
+  print "data already in table!"
 
 # aufgabe 10c
 def get_city_and_state_h(table, plz):
@@ -48,7 +58,7 @@ def get_city_and_state_h(table, plz):
 def plz_for_town_h(table, town):
   return [key for key, data in table.scan(columns=['family:city']) if data["family:city"] == town]
 
-# print get_city_and_state_h(table, '47270')
-# print plz_for_town_h(table, 'HAMBURG')
+print get_city_and_state_h(table, '47270')
+print plz_for_town_h(table, 'HAMBURG')
 
 
