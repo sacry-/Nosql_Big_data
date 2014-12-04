@@ -62,9 +62,15 @@ def get_city_and_state_h(table, plz):
 def plz_for_town_h(table, town):
   return [key for key, data in table.scan(columns=['zip:city']) if data["zip:city"] == town]
 
+def football_for_town(table, town):
+  plz = plz_for_town_h(table, town)
+  d = table.row(plz)
+  return d["fussball:city"]
+
 print get_city_and_state_h(table, '47270')
 print plz_for_town_h(table, 'HAMBURG')
-
+print football_for_town(table, 'HAMBURG')
+print football_for_town(table, 'BELCHERTOWN')
 
 
 
