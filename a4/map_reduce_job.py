@@ -1,4 +1,5 @@
 
+
 def create_job(config):
   hadoop_dir = config["hadoop_dir"]
   path_to_streaming_jar = config["path_to_streaming_jar"]
@@ -27,6 +28,7 @@ def execute(copy_from_local, map_reduce, copy_to_local):
   call(map_reduce)
   call(copy_to_local)
 
+
 def create_config(nosql_dir=None, hadoop_home=None, stream_jar=None):
   if not nosql_dir: 
     from os import path
@@ -52,8 +54,6 @@ def create_config(nosql_dir=None, hadoop_home=None, stream_jar=None):
   return config
 
 
-# uses defaults: python map_reduce_job.py
-# uses provided paths: python map_reduce_job.py -hadoop_home=abc/de -stream_jar=abc/de
 def parse_args():
   from argparse import ArgumentParser
   parser = ArgumentParser(description="start map reduce job")
@@ -64,6 +64,8 @@ def parse_args():
   return (args.nosql_dir, args.hadoop_home, args.stream_jar)
 
 
+# uses defaults: python map_reduce_job.py
+# uses provided paths: python map_reduce_job.py -hadoop_home=abc/de -stream_jar=abc/de
 def run_job():
   nosql_dir, hadoop_home, stream_jar = parse_args()
   config = create_config(nosql_dir, hadoop_home, stream_jar)
@@ -72,4 +74,8 @@ def run_job():
 
 
 run_job()
+
+
+
+
 
