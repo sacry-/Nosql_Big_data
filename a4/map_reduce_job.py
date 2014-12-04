@@ -1,5 +1,6 @@
 import os, sys
 
+
 def create_job(config):
   hadoop_dir = config["hadoop_dir"]
   path_to_streaming_jar = config["path_to_streaming_jar"]
@@ -29,7 +30,8 @@ def execute(copy_from_local, map_reduce, copy_to_local):
   call(copy_to_local)
 
 
-nosql_files = "%s/files/" % os.path.dirname(os.path.realpath(__file__))
+nosql_dir = os.path.dirname(os.path.realpath(__file__))
+nosql_files = "%s/files/" % nosql_dir
 config = {
   "input_path" : "%sinput.txt" % nosql_files,
   "output_path" : "%soutput.txt" % nosql_files,
