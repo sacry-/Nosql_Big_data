@@ -14,7 +14,7 @@ def data_exists(table):
 
 def populate_hbase(table):
   print "setting up table"
-  list_of_hashes = load_file("%s/plz.data" % abs_file_path)
+  list_of_hashes = load_file("%s/files/plz.data" % abs_file_path)
   for h in list_of_hashes:
     zip_code = h["_id"]
     h.pop("_id", None)

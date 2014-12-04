@@ -29,17 +29,17 @@ def execute(copy_from_local, map_reduce, copy_to_local):
   call(copy_to_local)
 
 
-nosql_dir = os.path.dirname(os.path.realpath(__file__))
+nosql_files = "%s/files/" % os.path.dirname(os.path.realpath(__file__))
 config = {
-  "input_path" : "%sinput.txt" % nosql_dir,
-  "output_path" : "%soutput.txt" % nosql_dir,
-  "mapper" : "%s/mapper.py" % nosql_dir,
-  "reducer" : "%s/reducer.py" % nosql_dir,
+  "input_path" : "%sinput.txt" % nosql_files,
+  "output_path" : "%soutput.txt" % nosql_files,
+  "mapper" : "%s/mapper.py" % nosql_files,
+  "reducer" : "%s/reducer.py" % nosql_files,
   "hadoop_dir" : "/usr/local/hadoop/bin/hadoop",
   "path_to_streaming_jar" : "/usr/local/hadoop/share/hadoop/tools/lib/hadoop-streaming-2.4.0.jar"
 }
 
-print "nosql dir: %s" % nosql_dir
+print "nosql files dir: %s" % nosql_files
 copy_from_local, map_reduce, copy_to_local = create_job(config)
 execute(copy_from_local, map_reduce, copy_to_local)
 
