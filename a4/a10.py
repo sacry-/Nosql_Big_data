@@ -20,7 +20,11 @@ def populate_hbase(table):
     h.pop("_id", None)
     result = {}
     for key, value in h.iteritems():
-      result["%s:%s" % ("family", key)] = str(value)
+      result["%s:%s" % ("zip", key)] = str(value)
+    val = ""
+    if result["zip:city"] in ["HAMBURG", "BREMEN"]:
+      val = "ja"
+    result["%s:%s" % ("fusball", "city")] = val
     table.put(zip_code, result)
 
 def setup_and_table():
@@ -32,7 +36,7 @@ def setup_and_table():
   print connection.tables()
   db_name = "zip2"
   try:
-    connection.create_table(db_name, {'family': dict(), "Fussball" : dict()})
+    connection.create_table(db_name, {'zip': dict(), "Fussball" : dict()})
     print "successfully created table!"
   except:
     print "table already exists"
@@ -52,13 +56,18 @@ else:
 # aufgabe 10c
 def get_city_and_state_h(table, plz):
   d = table.row(plz)
-  return (d["family:city"], d["family:state"])
+  return (d["zip:city"], d["zip:state"])
 
 # aufgabe 10d
 def plz_for_town_h(table, town):
-  return [key for key, data in table.scan(columns=['family:city']) if data["family:city"] == town]
+  return [key for key, data in table.scan(columns=['zip:city']) if data["zip:city"] == town]
 
 print get_city_and_state_h(table, '47270')
 print plz_for_town_h(table, 'HAMBURG')
+
+
+
+
+
 
 
