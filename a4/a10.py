@@ -24,7 +24,7 @@ def populate_hbase(table):
     val = ""
     if result["zip:city"] in ["HAMBURG", "BREMEN"]:
       val = "ja"
-    result["%s:%s" % ("fusball", "city")] = val
+    result["%s:%s" % ("fussball", "city")] = val
     table.put(zip_code, result)
 
 def setup_and_table():
@@ -34,9 +34,9 @@ def setup_and_table():
   print "connection opened"
 
   print connection.tables()
-  db_name = "zip2"
+  db_name = "plz_data"
   try:
-    connection.create_table(db_name, {'zip': dict(), "Fussball" : dict()})
+    connection.create_table(db_name, {'zip': dict(), "fussball" : dict()})
     print "successfully created table!"
   except:
     print "table already exists"
@@ -45,13 +45,6 @@ def setup_and_table():
   print "tables: %s" % connection.tables()
 
   return table
-
-table = setup_and_table()
-
-if not data_exists(table):
-  populate_hbase(table)
-else:
-  print "data already in table!"
 
 # aufgabe 10c
 def get_city_and_state_h(table, plz):
@@ -62,15 +55,26 @@ def get_city_and_state_h(table, plz):
 def plz_for_town_h(table, town):
   return [key for key, data in table.scan(columns=['zip:city']) if data["zip:city"] == town]
 
+# aufgabe 10b test
 def football_for_town(table, town):
-  plz = plz_for_town_h(table, town)
-  d = table.row(plz)
-  return d["fussball:city"]
+  for plz in plz_for_town_h(table, town):
+    d = table.row(plz)
+    yield (d["zip:city"], d["zip:state"], d["fussball:city"])
+
+
+table = setup_and_table()
+
+if not data_exists(table):
+  populate_hbase(table)
+else:
+  print "data already in table!"
+
 
 print get_city_and_state_h(table, '47270')
 print plz_for_town_h(table, 'HAMBURG')
-print football_for_town(table, 'HAMBURG')
-print football_for_town(table, 'BELCHERTOWN')
+
+print list(football_for_town(table, 'HAMBURG'))
+print list(football_for_town(table, 'BELCHERTOWN'))
 
 
 
