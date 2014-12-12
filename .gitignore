@@ -56,5 +56,5 @@ target/
 # DB + Mac
 .DS_Store
 dump.rdb
-
+WDI_Data.csv
 
