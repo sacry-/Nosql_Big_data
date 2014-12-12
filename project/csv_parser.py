@@ -42,7 +42,7 @@ class WorldBankParser():
     return list(parse_csv(self.path_to_csv, self.sep, self.quote_char))
 
 
-class WorldIndicators():
+class WorldBankIndicator():
 
   def __init__(self, csv_name):
     self.rows = WorldBankParser(csv_name).parse()
@@ -60,7 +60,7 @@ class WorldIndicators():
     return result
 
   def __repr__(self):
-    return "WorldBankData<%s, %s-%s, size: %s>" % (self.title, self.start_year, self.latest_year, len(self.data))
+    return "WorldBankIndicator<%s, %s-%s, size: %s>" % (self.title, self.start_year, self.latest_year, len(self.data))
 
 
 class WorldBankWDI():
@@ -104,7 +104,7 @@ def indicators():
   # http://data.worldbank.org/indicator/all
   csv_dir = "%s/world_bank" % os.path.dirname(os.path.realpath(__file__))
   for f in yield_files(csv_dir, ".*_[iI]ndicator_.*"):
-    yield WorldIndicators(f)
+    yield WorldBankIndicator(f)
 
 def wdi_data():
   # download first 140mb! 
