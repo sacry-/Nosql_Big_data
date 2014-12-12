@@ -1,25 +1,6 @@
-import csv
-import os, sys
-import re
+from parsing import WorldBankParser
+from parsing import project, yield_files
 
-
-def parse_csv(csv_path, column_separator, quote_char):
-  with open(csv_path, 'rb') as csvfile:
-    csv_reader = csv.reader(csvfile, delimiter=column_separator, quotechar=quote_char)
-    for row in csv_reader:
-      yield row
-
-def yield_files(csv_dir, match_pattern=".*"):
-  from os import listdir
-  from os.path import isfile, join
-  pattern = re.compile(match_pattern)
-  result = []
-  for f in listdir(csv_dir):
-    if f.endswith(".csv") and isfile(join(csv_dir, f)):
-      m = pattern.search(f)
-      if m:
-        result.append(m.group())
-  return result
 
 def fetch_years(header):
   years = []
@@ -27,19 +8,6 @@ def fetch_years(header):
     if column.isdigit():
       years.append(int(column))
   return (years[0], years[-1])
-
-
-class WorldBankParser():
-
-  base = "%s/world_bank" % os.path.dirname(os.path.realpath(__file__))
-
-  def __init__(self, csv_name):
-    self.path_to_csv = "%s/%s" % (self.base, csv_name)
-    self.sep = ","
-    self.quote_char = '"'
-
-  def parse(self):
-    return list(parse_csv(self.path_to_csv, self.sep, self.quote_char))
 
 
 class WorldBankIndicator():
@@ -98,12 +66,10 @@ class WorldBankWDI():
     return "WorldBankWDI<%s-%s, indicators: %s, avg per indicator: %s, total: %s>" % (self.start_year, self.latest_year, stats[0], stats[1], stats[2])
 
 
-
-
 def indicators():
   # http://data.worldbank.org/indicator/all
-  csv_dir = "%s/world_bank" % os.path.dirname(os.path.realpath(__file__))
-  for f in yield_files(csv_dir, ".*_[iI]ndicator_.*"):
+  csv_dir = "%s/world_bank" % project()
+  for f in yield_files(csv_dir, ".csv", ".*_[iI]ndicator_.*"):
     yield WorldBankIndicator(f)
 
 def wdi_data():
