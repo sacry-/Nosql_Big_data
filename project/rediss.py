@@ -100,7 +100,12 @@ class RWorldBank(Rediss):
   def __repr__(self):
     return "RWorldBank %s with db%s" % (super(RWorldBank, self).__repr__(), self.db)
 
+class RUnData(Rediss):
 
+  def __init__(self, host="localhost", port=6379):
+    super(RUnData, self).__init__(host, port)
+    self.db = 1
+    self.rs = redis.Redis(host=self.host, port=self.port, db=self.db)
 
-
-
+  def __repr__(self):
+    return "RUnData %s with db%s" % (super(RUnData, self).__repr__(), self.db)
