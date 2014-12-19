@@ -4,6 +4,12 @@ import ast
 
 LEVAL = ast.literal_eval
 
+def save_eval(obj):
+  try:
+    return LEVAL(obj)
+  except:
+    return obj
+
 class Rediss(object):
 
   def __init__(self, host="localhost", port=6379):
@@ -17,45 +23,39 @@ class Rediss(object):
     for key in self.rs.keys(pattern): 
       yield key
 
-  def real_title(self, redis_title):
-    return redis_title.split(":", 1)[1]
-
   def values_by_pattern(self, pattern):
     for value in self.rs.mget(self.keys(pattern)):
       if value:
-        yield LEVAL(value)
+        yield save_eval(value)
 
+  # Regex for keys -> [(key, value)..]
   def key_value_by_pattern(self, pattern):
     pattern_keys = list(self.keys(pattern))
     all_values = self.rs.mget(pattern_keys)
     for (key, value) in zip(pattern_keys, all_values):
       if key and value:
-        yield (self.real_title(key), LEVAL(value))
+        yield (key, save_eval(value))
 
-  def values_by_titles(self, category, titles, ordered=False):
-    keys = map(lambda title: self.key_name(category, title), titles)
-    # ordered returns as many elemts as the input list was
+  # [key] -> [value]
+  def values_by_keys(self, keys):
     for key in self.rs.mget(keys):
       if key:
-        yield LEVAL(key)
-      else:
-        if ordered:
-          yield {}
+        yield save_eval(key)
 
-  def value_by_title(self, category, title):
-    val = self.rs.get(self.key_name(category, title))
+  def get_key(self, key):
+    val = self.rs.get(key)
     if val:
-      return LEVAL(val)
+      return save_eval(val)
     return {}
 
-  def put(self, category, title, content):
+  def put(self, key, content):
     r = redis
-    self.rs.set(self.key_name(category, title), content)
+    self.rs.set(key, content)
 
-  def puts(self, category, mapping):
+  def puts(self, mapping):
     self.rs.mset(
       dict(
-        (self.key_name(category, title), str(value)) for title, value in mapping.iteritems()
+        (key, str(value)) for key, value in mapping.iteritems()
       )
     )
 
@@ -77,8 +77,8 @@ class Rediss(object):
         break
       n -= 1
 
-  def exists(self, key_name):
-    return self.rs.exists(key_name)
+  def exists(self, key):
+    return self.rs.exists(key)
 
   def ping(self):
     print "ping: %s from: %s" % (self.rs.ping(), self)
