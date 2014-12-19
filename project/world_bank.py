@@ -1,5 +1,5 @@
 from parsing import WorldBankParser
-from parsing import project, yield_files
+from parsing import project_path, yield_files
 
 
 def fetch_years(header):
@@ -68,7 +68,7 @@ class WorldBankWDI():
 
 def indicators():
   # http://data.worldbank.org/indicator/all
-  csv_dir = "%s/world_bank" % project()
+  csv_dir = "%s/world_bank" % project_path()
   for f in yield_files(csv_dir, ".csv", ".*_[iI]ndicator_.*"):
     yield WorldBankIndicator(f)
 

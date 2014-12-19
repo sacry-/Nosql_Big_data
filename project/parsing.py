@@ -3,7 +3,7 @@ import os, sys
 import re
 
 
-def project():
+def project_path():
   return os.path.dirname(os.path.realpath(__file__))
 
 def parse_csv(csv_path, column_separator, quote_char):
@@ -27,7 +27,7 @@ def yield_files(folder, extension, match_pattern=".*"):
 
 class WorldBankParser():
 
-  base = "%s/world_bank" % project()
+  base = "%s/world_bank" % project_path()
 
   def __init__(self, csv_name):
     self.path_to_csv = "%s/%s" % (self.base, csv_name)
