@@ -109,3 +109,11 @@ class RUnData(Rediss):
 
   def __repr__(self):
     return "RUnData %s with db%s" % (super(RUnData, self).__repr__(), self.db)
+
+  def puts(self, json_list):
+    #print json_list
+    #print json_list["Germany"]
+    for key, data in json_list.items():
+      self.put(key,data)
+    
+
