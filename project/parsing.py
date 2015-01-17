@@ -25,19 +25,25 @@ def parse_xml(xml_path, indicator) :
       field_value = field.text
 
       if field_value:
-        if field_name == "Country or Area":
+        if field_name == "Country or Area" or field_name == "Reference Area":
+          #Remove . from Country Name
           country = field_value.replace(".","")
-          
+          #print country
           record["Country"] = country
-        elif field_name == "Year(s)":
+        elif field_name == "Year(s)" or field_name == "Time Period":
           record["Year"] = field_value
         else:  
           record[field_name] = field_value
 
     if record:
-      data.setdefault(country+"."+indicator+"."+record["Year"],[])
-      data[country+"."+indicator+"."+record["Year"]].append(record)
-
+      #If there is a Range of Years, take the first one
+      years = record["Year"].split("-")
+      record["Year"] = years[0]
+      try: 
+        data.setdefault(record["Country"]+"."+indicator+"."+record["Year"],[])
+        data[record["Country"]+"."+indicator+"."+record["Year"]].append(record)
+      except:
+        print "XML Parse Error on Record:"+ record
   return data
 
 def yield_files(folder, extension, match_pattern=".*"):
