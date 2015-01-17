@@ -1,3 +1,4 @@
+import re
 from parsing import WorldBankParser
 from parsing import project_path, yield_files
 
@@ -9,6 +10,13 @@ def fetch_years(header):
       years.append(int(column))
   return (years[0], years[-1])
 
+def mongo_indicator_normalizer(s):
+  s = s.strip().lower()
+  s = re.sub('[\W\s]', '_', s)
+  s = re.sub('\_+', '_', s)
+  if s.endswith("_"):
+    s = s[:-1]
+  return re.sub('\$', '', s)
 
 class WorldBankIndicator():
 
@@ -33,6 +41,7 @@ class WorldBankIndicator():
 
 class WorldBankWDI():
 
+
   def __init__(self, csv_name):
     self.rows = WorldBankParser(csv_name).parse()
     self.header_index = 0
@@ -43,14 +52,22 @@ class WorldBankWDI():
   def __data__(self, rows):
     result = {}
     for row in rows[(self.header_index + 1):]:
-      country = row[0]
-      indicator = row[2]
+      country = self.__normalize__(row[0])
+      normed_indicator = mongo_indicator_normalizer(row[2])
+      indicator = self.__normalize__(row[2])
       sub_hash = dict(zip(self.header, row))
-      if result.has_key(indicator):
-        result[indicator][country] = sub_hash
+      if result.has_key(normed_indicator):
+        result[normed_indicator][country] = sub_hash
       else:
-        result[indicator] = { country : sub_hash }
+        result[normed_indicator] = { country : sub_hash, "indicator" : indicator }
     return result
+
+  def get_year_keys(self):
+    return map(str, range(self.start_year, self.latest_year + 1))
+
+  def __normalize__(self, s):
+    s = s.strip().lower()
+    return re.sub('\$', '', s)
 
   def __stats__(self):
     sub_sizes = [reduce(lambda a,y: a+1, x, 0) for (i, x) in self.data.iteritems()]
@@ -79,10 +96,10 @@ def wdi_data():
   wdi_file = "WDI_Data.csv"
   return WorldBankWDI(wdi_file)
 
-
-for indicator in indicators():
-  print indicator
-print wdi_data()
+if __name__ == "__main__":
+  for indicator in indicators():
+    print indicator
+  print wdi_data()
 
 
 
