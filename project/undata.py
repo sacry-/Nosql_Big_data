@@ -57,11 +57,4 @@ def undata_to_redis():
   for indicator in indicators():
     rundata.puts(indicator.data)
 
-
-indicator_map = [
-  ""
-]  
-#  if indicator.title=="beer":
-#   print indicator.data[dict_to_key({"indicator":"beer","country":"Germany","year":2010})]
-
-#undata_to_redis()
+undata_to_redis()

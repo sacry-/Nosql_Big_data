@@ -3,7 +3,7 @@ import rediss
 import parsing
 import undata
 import json
-
+from operator import itemgetter, attrgetter
 
 rundata = rediss.RUnData()
 
@@ -37,26 +37,26 @@ score_schema = {
         "communication_mobile_subscriptions_per_100":{"value_type":"percent","value_key":"Value","good":"high","weight":5.0},
         "communication_telephone_subscriptions_per_100":{"value_type":"percent","value_key":"Value","good":"high","weight":5.0},
         # National accounts and industrial production
-        "ind_prod_gpd_usd":{"value_type":"absolute","value_key":"Value","good":"high","weight":0.0001},
-        "ind_prod_gni_ppp_usd":{"value_type":"absolute","value_key":"Value","good":"high","weight":0.0001},
+        "ind_prod_gpd_usd":{"value_type":"absolute","value_key":"Value","value_factor":0.0001,"good":"high","weight":1.0},
+        "ind_prod_gni_ppp_usd":{"value_type":"absolute","value_key":"Value","value_factor":0.0001,"good":"high","weight":1.0},
         #Labour force
         "labour_unemployment_general_level":{"value_type":"absolute","value_key":"Value","value_factor":1000,"filter":{"Sex":"Total men and women"},"good":"high","weight":10.0},#hier mal 1000 weil der value in 1000 schritten angegeben ist
         #Wages and prices
         "wages_prices_wages":{"value_type":"percent","value_key":"Value","filter":{"Sex":"Total men and women"},"good":"high","weight":0.0},#nicht berechnet! kaum ein land hat diesen wert,
         #Manufacturing:
-        "manufacturing_beer":{"value_type":"absolute","value_key":"Value","value_factor":1000000,"filter":{"Unit":"Mil. USD"},"good":"high","weight":0.001},
-        "manufacturing_tobacco":{"value_type":"absolute","value_key":"Value","value_factor":1000000,"filter":{"Unit":"Mil. USD"},"good":"high","weight":0.0001},
-        "manufacturing_woven_woolen_fabrics":{"value_type":"absolute","value_key":"Value","value_factor":1000000,"filter":{"Unit":"Mil. USD"},"good":"high","weight":0.001},
-        "manufacturing_woven_cotton_fabrics":{"value_type":"absolute","value_key":"Value","value_factor":1000000,"filter":{"Unit":"Mil. USD"},"good":"high","weight":0.001},
-        "manufacturing_footwear_leather_uppers":{"value_type":"absolute","value_key":"Value","value_factor":1000000,"filter":{"Unit":"Mil. USD"},"good":"high","weight":0.001},
-        "manufacturing_pesticides":{"value_type":"absolute","value_key":"Value","value_factor":1000000,"filter":{"Unit":"Mil. USD"},"good":"high","weight":0.001},
-        "manufacturing_pigiron_spiegeleisen":{"value_type":"absolute","value_key":"Value","value_factor":1000000,"filter":{"Unit":"Mil. USD"},"good":"high","weight":0.001},
-        "manufacturing_radio_receivers":{"value_type":"absolute","value_key":"Value","value_factor":1000000,"filter":{"Unit":"Mil. USD"},"good":"high","weight":0.001},
-        "manufacturing_tv_receivers":{"value_type":"absolute","value_key":"Value","value_factor":1000000,"filter":{"Unit":"Mil. USD"},"good":"high","weight":0.001},
-        "manufacturing_cars":{"value_type":"absolute","value_key":"Value","value_factor":1000000,"filter":{"Unit":"Mil. USD"},"good":"high","weight":0.001},
-        "manufacturing_household":{"value_type":"absolute","value_key":"Value","value_factor":1000000,"filter":{"Unit":"Mil. USD"},"good":"high","weight":0.001},
-        "manufacturing_tools":{"value_type":"absolute","value_key":"Value","value_factor":1000000,"filter":{"Unit":"Mil. USD"},"good":"high","weight":0.001},
-        "manufacturing_trucks":{"value_type":"absolute","value_key":"Value","value_factor":1000000,"filter":{"Unit":"Mil. USD"},"good":"high","weight":0.001}
+        #"manufacturing_beer":{"value_type":"absolute","value_key":"Value","value_factor":1000000,"filter":{"Unit":"Mil. USD"},"good":"high","weight":0.001},
+        #"manufacturing_tobacco":{"value_type":"absolute","value_key":"Value","value_factor":1000000,"filter":{"Unit":"Mil. USD"},"good":"high","weight":0.0001},
+        #"manufacturing_woven_woolen_fabrics":{"value_type":"absolute","value_key":"Value","value_factor":1000000,"filter":{"Unit":"Mil. USD"},"good":"high","weight":0.001},
+        #"manufacturing_woven_cotton_fabrics":{"value_type":"absolute","value_key":"Value","value_factor":1000000,"filter":{"Unit":"Mil. USD"},"good":"high","weight":0.001},
+        #"manufacturing_footwear_leather_uppers":{"value_type":"absolute","value_key":"Value","value_factor":1000000,"filter":{"Unit":"Mil. USD"},"good":"high","weight":0.001},
+        #"manufacturing_pesticides":{"value_type":"absolute","value_key":"Value","value_factor":1000000,"filter":{"Unit":"Mil. USD"},"good":"high","weight":0.001},
+        #"manufacturing_pigiron_spiegeleisen":{"value_type":"absolute","value_key":"Value","value_factor":1000000,"filter":{"Unit":"Mil. USD"},"good":"high","weight":0.001},
+        #"manufacturing_radio_receivers":{"value_type":"absolute","value_key":"Value","value_factor":1000000,"filter":{"Unit":"Mil. USD"},"good":"high","weight":0.001},
+        #"manufacturing_tv_receivers":{"value_type":"absolute","value_key":"Value","value_factor":1000000,"filter":{"Unit":"Mil. USD"},"good":"high","weight":0.001},
+        #"manufacturing_cars":{"value_type":"absolute","value_key":"Value","value_factor":1000000,"filter":{"Unit":"Mil. USD"},"good":"high","weight":0.001},
+        #"manufacturing_household":{"value_type":"absolute","value_key":"Value","value_factor":1000000,"filter":{"Unit":"Mil. USD"},"good":"high","weight":0.001},
+        #"manufacturing_tools":{"value_type":"absolute","value_key":"Value","value_factor":1000000,"filter":{"Unit":"Mil. USD"},"good":"high","weight":0.001},
+        #"manufacturing_trucks":{"value_type":"absolute","value_key":"Value","value_factor":1000000,"filter":{"Unit":"Mil. USD"},"good":"high","weight":0.001}
   }
 
 indicator_population = "population_total"
@@ -101,7 +101,7 @@ def find_nearest_year(key_dict):
   max_diff = 5
   if rundata.get_key(undata.dict_to_key(key_dict)):
     year = key_dict["year"]
-  else: 
+  else:
     for key in rundata.keys(key_dict["country"]+"."+key_dict["indicator"]+".*"):
       curr_key_dict = undata.key_to_dict(key)
       diff = abs(curr_key_dict["year"]-key_dict["year"])
@@ -183,16 +183,12 @@ def calculate_points(schema,value):
       points = points * schema["weight"]    
   return points
 
-def all_year_points_for_country():
-  return False
-
 def points_for_country(country,year):
   key_dict = dict()
   key_dict["country"] = country
   key_dict["year"] = year
   
-  points_sum = 0
-  indicator_count = 0
+  result = dict()
 
   for indicator,schema in score_schema.iteritems():
     key_dict["indicator"] = indicator
@@ -200,32 +196,71 @@ def points_for_country(country,year):
     key_dict["year"] = find_nearest_year(key_dict)
     value = False
 
+    result[indicator] = dict()
+
     if key_dict["year"]:
       value = find_value(key_dict)
       if value==0 or value:
+        result[indicator]["value"] = value
         points = calculate_points(schema,value)
         if points:
-          points_sum += points
-          indicator_count += 1  
-        print "%s get %f Points for %s value: %f" % (country,points,indicator,value)
+          result[indicator]["points"] = points
+        #print "%s get %f Points for %s value: %f" % (country,points,indicator,value)
     
     if value!=0 and not value:
-      print "no indicator %s for %s" % (indicator,country)
+      result[indicator] = False
+      #print "no indicator %s for %s" % (indicator,country)
 
+  return result
+  
+def print_points_country(country,year):
+  indicator_count = 0
+  points_sum = 0
+
+  for indicator,data in points_for_country(country,year).iteritems():
+    if "points" in data:
+      indicator_count += 1
+      points_sum += data["points"]
+      print "%s get %f Points for %s value: %f" % (country,data["points"],indicator,data["value"])  
+    else:
+      print "no data for indicator %s" % (indicator)
   print "============================"
   relativ_points = (points_sum/indicator_count)
   print "%s got %f Points with %d indicators" % (country,relativ_points,indicator_count)   
 
+
+def all_year_points_for_country(country,start,end):
+  result = dict()
+  for year in range(start,end):
+    calculate_stats(year)
+    points_sum = 0
+    indicator_count = 0
+    for indicator,data in points_for_country(country,year).iteritems(): 
+      if "points" in data: 
+        points_sum += data["points"]
+        indicator_count+=1
+    if indicator_count:    
+      result[year] = (points_sum/indicator_count)     
+  return result   
+
+def print_all_year_points_for_country(country,start,end):
+  all_year_points = all_year_points_for_country(country,start,end)
+  print "Points for %s from %d to %d:" % (country,start,end)
+  for year,points in all_year_points.iteritems():
+    print "%d: %f" % (year,points)
+        
 def points_all_countrys(year):   
   countrys = set()
   countrys_without_points = list()
   for key in rundata.keys("*"):
     key_dict = undata.key_to_dict(key)
     countrys.add(key_dict["country"])
-  countrys = sorted(list(countrys))
+  
   
   country_points = dict()
   country_indicator_count = dict()
+
+  result = dict()
 
   for country in countrys:
     points_sum = 0
@@ -235,45 +270,56 @@ def points_all_countrys(year):
     key_dict["year"] = year
 
     for indicator,schema in score_schema.iteritems():
-      key_dict["indicator"] = indicator
-      key_dict["year"] = year
-      key_dict["year"] = find_nearest_year(key_dict)
+      if "avg" in schema:
+        key_dict["indicator"] = indicator
+        key_dict["year"] = year
+        key_dict["year"] = find_nearest_year(key_dict)
 
-      if key_dict["year"]:
-        value = find_value(key_dict)
+        if key_dict["year"]:
+          value = find_value(key_dict)
 
-        #Value kann Float oder False sein, da 0==False wird vorher auf 0 ueberprueft  
-        if value==0 or value:
-          points = calculate_points(schema,value)
-          if points:
-            indicator_count += 1
-            points_sum += points
+          #Value kann Float oder False sein, da 0==False wird vorher auf 0 ueberprueft  
+          if value==0 or value:
+            points = calculate_points(schema,value)
+            if points:
+              indicator_count += 1
+              points_sum += points
   
-    if indicator_count>=5:
-      country_indicator_count[country] = indicator_count
-      country_points[country] = points_sum/indicator_count
-      #print "%s got %f Points by %d indictors" % (country,points_sum,indicator_count)  
+    result[country] = dict()
+    if indicator_count:
+      result[country]["relativ_points"] = points_sum/indicator_count
     else:
-      countrys_without_points.append(country)
+      result[country]["relativ_points"] = 0
 
+    result[country]["points"] = points_sum
+    result[country]["indicator_count"] = indicator_count
+      
+  return result  
+  #print "Countrys without Points (less then 10 indicators):"
+  #print countrys_without_points    
 
-  countrys_sorted_by_points = sorted(country_points, key=country_points.get, reverse=True)
-  for country in countrys_sorted_by_points:
-    indicator_count = country_indicator_count[country]
-    points_sum = country_points[country]
+def print_points_all_countrys(year):
+  country_points = points_all_countrys(year)
 
-    print "%s got %f Points with %d indicators" % (country,points_sum,indicator_count)
+  countrys_sorted_by_points = sorted(country_points.items(), key=lambda x:x[1]['relativ_points'], reverse=True)
+  
+  for country,data in countrys_sorted_by_points:
+    indicator_count = data["indicator_count"]
+    relativ_points = data["relativ_points"]
+    if indicator_count>=10:
+      print "%s got %f Points with %d indicators" % (country,relativ_points,indicator_count)
 
-  print "Countrys without Points (less then 5 indicators):"
-  print countrys_without_points    
 
 calculate_stats(2011)     
-#points_for_country("Germany",2011)
+#print_points_for_country("Germany",2011)
+print_points_all_countrys(2011)
+#print_all_year_points_for_country("Germany",2005,2016)
+#print_points_country("Germany",2011)
 #points_for_country("Qatar",2011)
 #points_for_country("Afghanistan",2011)
 #points_for_country("India",2011)
 
-points_all_countrys(2011)    
+
 #for country in countrys:
   #stats_for_country(country,2011)
 #stats_for_country("Germany",2011)
