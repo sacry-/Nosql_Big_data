@@ -66,6 +66,12 @@ def average(data):
         pass
   return result / c
 
+def average_list(l):
+  try:
+    return sum(l) / len(l)
+  except:
+    return 0
+
 def interpret(mdb, indicators):
   result = {}
   for (indicator, goods, bads) in indicators:
@@ -73,15 +79,24 @@ def interpret(mdb, indicators):
     data = mongo.time_series_query(coll)
     g, b = [], []
     for entry in data:
-      if entry["country"] in goods:
+      if entry["country"].lower() in goods:
         g.append( average(entry) )
-      if entry["country"] in bads:
+      if entry["country"].lower() in bads:
         b.append( average(entry) )
-    g = sum(g) / len(g)
-    b = sum(b) / len(b)
+    g = average_list(g)
+    b = average_list(b)
 
+    good_countries, bad_countries = [], []
     for entry in data:
-      pass
+      c = entry["country"]
+      a = average(entry)
+      near_to_g = a - g 
+      near_to_b = a - b 
+      print near_to_b
+      if near_to_g < near_to_b:
+        good_countries.append( c )
+      else:
+        bad_countries.append ( c ) 
   return result
 
 
@@ -89,5 +104,5 @@ mdb = mongo.MongoDB("wdi_data")
 mongo.test_mongo(mdb)
 
 
-# interpret(mdb, indicators)
+interpret(mdb, indicators)
 
