@@ -4,6 +4,7 @@ import re
 
 from world_bank import wdi_data
 
+
 # sudo mongod
 # sudo mongo
 # http://api.mongodb.org/python/current/tutorial.html
@@ -29,6 +30,9 @@ class MongoDB(Mongo):
   def collections(self):
     return self.db.collection_names()
 
+  def size(self):
+    return len(self.collections())
+
   def has_data(self, n):
     already_migrated = len(self.collections()) > n
     if already_migrated:
@@ -52,7 +56,6 @@ def test_mongo(mdb):
   coll = mdb.get(name)
   result = ", ".join( sorted([entry["country"] for entry in time_series_query(coll)]) )
   print name
-  print result
 
 def migrate_world_bank_data(mdb):
   wdi = wdi_data()
