@@ -1,5 +1,6 @@
 import mongo
 import time
+import re
 from hdi_rank import HDIRank
 
 
@@ -33,7 +34,7 @@ def heuristic(entry, good_avg, bad_avg):
   c = entry["country"]
 
   country_average = average_entry(entry)
-  r1 = abs(country_average - good_avg)
+  r1 = 0.8 * abs(country_average - good_avg)
   r2 = abs(country_average - bad_avg)
 
   gc, bc = 0, 0 
@@ -105,9 +106,15 @@ indicators = mdb.collections()
 
 t1 = time.time()
 
-biased_good, biased_bad = HDIRank().goods_bads(n)
+hdi_good, hdi_bad = HDIRank().goods_bads(n)
+
+gsize, bsize = len(hdi_good) / 2, len(hdi_bad) / 2
+biased_good = hdi_good[:gsize] + hdi_bad[:bsize]
+biased_bad = hdi_good[gsize:] + hdi_bad[bsize:]
+
 good, bad = interpret(mdb, indicators, biased_good, biased_bad)
 
+print "%s\n%s" % (biased_bad, biased_good)
 print_seq(good, n, "top %s goods:" % n)
 print_seq(bad, n, "top %s bads:" % n)
 

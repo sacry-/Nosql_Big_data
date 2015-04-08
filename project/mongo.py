@@ -41,16 +41,21 @@ class MongoDB(Mongo):
       print "Migration necessary!"
     return already_migrated
 
+def years(start, end):
+  return map(lambda x: "years.%s" % x, range(start, end + 1))
 
-def time_series_query(coll):
-  regx = re.compile("[0-9E\+\.]+", re.IGNORECASE)
-  years = map(str, range(1980, 2014 + 1))
-  query = {"$or" : [{"years.%s" % year : { "$regex": regx }} for year in years]}
+def query_params(regex, years):
+  return map(lambda year: { year : { "$regex": regex } }, years)
+
+def time_series_query(coll, start=2000, end=2014, regex=None):
+  if not regex:
+    regex = re.compile("[0-9E\+\.]+", re.IGNORECASE)
+  query = { "$or" : query_params(regex, years(start, end)) }
   for entry in coll.find(query):
     yield entry
 
 def test_mongo(mdb):
-  if not mdb.has_data(1300):
+  if mdb.size() < 1300:
     migrate_world_bank_data(mdb)
   name = "women_who_believe_a_husband_is_justified_in_beating_his_wife_when_she_goes_out_without_telling_him"
   coll = mdb.get(name)
